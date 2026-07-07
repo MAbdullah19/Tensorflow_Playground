@@ -1,6 +1,10 @@
 import type { BoundaryResponse, Config, Snapshot } from "./types";
 
-const BASE = "/api";
+// In dev, VITE_API_BASE is unset -> "/api" is proxied to the backend by Vite.
+// In production, set VITE_API_BASE to the backend's origin
+// (e.g. https://nn-playground-backend.onrender.com) so calls go cross-origin.
+const API_ROOT = import.meta.env.VITE_API_BASE ?? "";
+const BASE = `${API_ROOT}/api`;
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(BASE + path, {
