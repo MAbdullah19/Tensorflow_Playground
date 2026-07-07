@@ -1,16 +1,10 @@
 # Neural Network Playground
 
-An interactive, from-scratch reimplementation of the classic
-[TensorFlow Playground](https://playground.tensorflow.org/). The neural-network
+An interactive reimplementation of the classic
+TensorFlow Playground. The neural-network
 engine, datasets, and training loop run in **Java 11** with zero third-party
 dependencies; a **React 18 + Vite + Tailwind** single-page app draws the network,
-the live decision boundary, and the loss curves.
-
-Built as an **Object-Oriented Programming course project**, so the Java engine is
-written to showcase OOP principles (encapsulation, inheritance, polymorphism,
-composition, interfaces, and common design patterns) rather than to be maximally
-terse. See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for a full
-concept-by-concept walkthrough and a plain-English neural-network glossary.
+the live decision boundary, and the loss curves. Built as an **Object-Oriented Programming course project**, so the Java engine is written to showcase OOP principles.
 
 ## Features
 
@@ -29,14 +23,6 @@ concept-by-concept walkthrough and a plain-English neural-network glossary.
 
 The frontend does no maths. It is a thin client that sends the current UI
 configuration to the backend and renders whatever snapshot comes back.
-
-```
- ┌──────────────┐   POST /api/sessions/{id}/train  { lr, regRate, batch, epochs }   ┌──────────────┐
- │   React UI   │  ───────────────────────────────────────────────────────────────▶ │  Java engine │
- │ (frontend/)  │                                                                    │  (backend/)  │
- │              │  ◀─────────────────────────────────────────────────────────────── │              │
- └──────────────┘   snapshot { iter, lossTrain, lossTest, layers, links, ... }       └──────────────┘
-```
 
 - **Sessions.** Each browser gets its own server-side `Session` holding its
   dataset, network, and training counters. `SessionManager` locks each session,
@@ -61,13 +47,11 @@ OOP_Neural_Network_Playground/
 │       ├── api/                 HTTP server, routing, sessions
 │       ├── exceptions/          typed exception hierarchy
 │       └── util/Json.java       hand-written JSON encoder/decoder
-├── frontend/     React 18 + Vite + Tailwind UI
-│   └── src/
-│       ├── api/                 typed fetch wrapper (client.ts, types.ts)
-│       ├── components/          controls, network graph, heatmap, loss chart
-│       └── util/                colour maps, dataset thumbnails, debounce
-├── playground/   Original TensorFlow Playground (TypeScript), read-only reference
-└── PROJECT_DOCUMENTATION.md
+└── frontend/     React 18 + Vite + Tailwind UI
+    └── src/
+        ├── api/                 typed fetch wrapper (client.ts, types.ts)
+        ├── components/          controls, network graph, heatmap, loss chart
+        └── util/                colour maps, dataset thumbnails, debounce
 ```
 
 ## Getting started
@@ -93,10 +77,7 @@ npm install
 npm run dev     # -> http://localhost:5173
 ```
 
-Open <http://localhost:5173>. Smoke-test the engine with
-`curl http://localhost:8080/health`, which returns `{"status":"ok"}`. Pick
-**circle**, press **Play**, and the loss should fall from ~0.5 to under 0.01
-within roughly 50 epochs.
+Open <http://localhost:5173>.
 
 ## REST API
 
@@ -131,17 +112,3 @@ All endpoints accept and return `application/json`. CORS is enabled for any orig
 | Singleton | `SquaredError.INSTANCE` |
 | Typed exceptions | `PlaygroundException` maps each error type to an HTTP status |
 
-## Deployment (free tier)
-
-The backend is a stateful long-lived process, so it needs an always-on container
-rather than a serverless function.
-
-- **Backend on Render:** New Web Service, root directory `backend`, runtime Docker
-  (uses `backend/Dockerfile`). Render injects `PORT`, which `Main.java` reads.
-- **Frontend on Vercel:** New Project, root directory `frontend` (framework
-  auto-detects as Vite). `frontend/vercel.json` proxies `/api` and `/health` to
-  the Render backend, so the relative API calls work with no CORS setup. Replace
-  the placeholder host in `vercel.json` with your Render URL before deploying.
-
-In production generally, run `npm run build` and serve `frontend/dist` from any
-static host, pointing the `/api` path at the Java backend.
